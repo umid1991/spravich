@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
@@ -11,53 +11,26 @@
       object-fit: cover;
       height: 180px;
     }
-    /* Yopishgan alfavit paneli */
-    #alphabetFilter {
-      position: sticky;
-      top: 0;
-      z-index: 999;
-      background-color: #fff;
-      padding-top: 10px;
-      padding-bottom: 10px;
-    }
-   
-  .cursor-pointer { cursor: pointer; }
-  .card-img-top {
-    object-fit: cover;
-    height: 180px;
-  }
-  .sticky-top {
-    position: sticky;
-    top: 0;
-    z-index: 1020;
-  }
-  .bg-white {
-    background-color: white;
-  }
-
-
   </style>
 </head>
 <body>
-    <div class="container py-4">
-        <div class="sticky-top bg-white pb-3">
-          <h1 class="mb-3">Темы по информатике</h1>
-          <div class="mb-3">
-            <input
-              type="text"
-              id="searchInput"
-              class="form-control"
-              placeholder="Поиск темы..."
-              oninput="searchTopics()"
-              aria-label="Поиск темы"
-            />
-          </div>
-          <div id="alphabetFilter" class="mb-3"></div>
-        </div>
-      
-        <div id="results" class="row gy-3"></div>
-      </div>
-      
+  <div class="container py-4">
+    <h1 class="mb-4">Темы по информатике</h1>
+
+    <div class="mb-3">
+      <input
+        type="text"
+        id="searchInput"
+        class="form-control"
+        placeholder="Поиск темы..."
+        oninput="searchTopics()"
+        aria-label="Поиск темы"
+      />
+    </div>
+
+    <div id="alphabetFilter" class="mb-3"></div>
+    <div id="results" class="row gy-3"></div>
+  </div>
 
   <!-- Модальное окно -->
   <div class="modal fade" id="contentModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">

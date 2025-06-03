@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Электронный справочник - ИКТ в экономике</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      padding-top: 120px;
+      background-color: #f5f7fa;
+    }
+
+    .card {
+      transition: 0.3s;
+      border-radius: 12px;
+    }
+
+    .card:hover {
+      background-color: #eef2f7;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .sticky-header {
+      background-color: #ffffff;
+      z-index: 1020;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar-custom {
+      background-color: #006d77;
+    }
+
+    .navbar-custom .navbar-brand {
+      font-weight: bold;
+      color: #ffffff;
+    }
+
+    .search-bar input {
+      border-radius: 30px;
+      padding-left: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-custom fixed-top">
+    <div class="container">
+      <a class="navbar-brand" href="#">ИКТ в экономике</a>
+    </div>
+  </nav>
+
+  <!-- Sticky header (sarlavha va qidiruv qismi) -->
+  <div class="sticky-top sticky-header py-3">
+    <div class="container">
+      <h1 class="text-center mb-3">Электронный справочник</h1>
+      <div class="search-bar">
+        <input type="text" id="searchInput" class="form-control" placeholder="Поиск по темам..." onkeyup="searchTopics()">
+      </div>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div class="container mt-4">
+    <div id="results" class="row"></div>
+  </div>
+
+  <!-- Modal oynasi -->
+  <div class="modal fade" id="contentModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalTitle"></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+        </div>
+        <div class="modal-body" id="modalBody"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scriptlar -->
+  <script>
+    const topics = [
+    {
+    "title": "Информационная технология",
+    "description": "Information technology / Technologie d'information",
+    "content": "Информационная технология - совокупность методов, производственных и программно-технологических средств..."
+  },
+  {
+    "title": "Автоматизированная информационная технология (АИТ)",
+    "description": "",
+    "content": "Информационная технология, в которой для передачи, сбора, хранения и обработки данных используются средства вычислительной техники..."
+  },
+  {
+    "title": "Аппаратное обеспечение",
+    "description": "Hardware",
+    "content": "Комплекс электронных, электрических и механических устройств, входящих в состав системы или сети..."
+  },
+  {
+    "title": "Association for computing machinery (ACM)",
+    "description": "Ассоциация по вычислительной технике",
+    "content": "Международная научная и образовательная организация, основная задача которой состоит в распространении навыков и знаний в ИТ-сфере."
+  },
+  {
+    "title": "Виртуальная реальность",
+    "description": "Virtual reality (VR)",
+    "content": "Форма компьютерного моделирования, позволяющая пользователю погрузиться в искусственный мир с помощью сенсорных устройств..."
+  },
+  {
+    "title": "Виртуальный мир",
+    "description": "Virtual worlds",
+    "content": "Наглядная компьютерная модель реальных процессов и явлений."
+  },
+  {
+    "title": "Высокая технология",
+    "description": "",
+    "content": "Совокупность информации, знаний, опыта, материальных средств для создания продукции высшего уровня."
+  },
+  {
+    "title": "Геоинформационные технологии (ГИС-технологии)",
+    "description": "",
+    "content": "Технологическая основа создания географических информационных систем."
+  },
+  {
+    "title": "Инструментарий информационной технологии",
+    "description": "",
+    "content": "Один или несколько программных продуктов, позволяющих достигать поставленные цели."
+  },
+  {
+    "title": "Информационный рынок",
+    "description": "Information market",
+    "content": "Система экономических, правовых и организационных отношений по торговле ИТ-продуктами и услугами."
+  },
+  {
+    "title": "Когнитивные технологии",
+    "description": "Cognitive technologies",
+    "content": "ИТ, ориентированные на развитие интеллектуальных способностей человека."
+  },
+  {
+    "title": "Конвергенция информационных технологий",
+    "description": "Convergence",
+    "content": "Процесс сближения электронных технологий в результате их взаимодействия."
+  },
+  {
+    "title": "Мультимедиа",
+    "description": "Multimedia",
+    "content": "Совокупность компьютерных технологий, использующих текст, графику, видео, звук и анимацию одновременно."
+  },
+  {
+    "title": "Мультимедиа технологии",
+    "description": "Мультимедиа ресурсы; Мультимедиа средства",
+    "content": "Современные средства аудио-визуальных и виртуальных коммуникаций."
+  },
+  {
+    "title": "Новая информационная технология",
+    "description": "",
+    "content": "Информационная технология с дружественным интерфейсом и интерактивным режимом работы."
+  },
+  {
+    "title": "Обмен вычислительными ресурсами",
+    "description": "Peer-to-peer computing (P2P)",
+    "content": "ИТ, обеспечивающая обмен вычислительными ресурсами между компьютерами."
+  },
+  {
+    "title": "Онлайновые технологии",
+    "description": "On-line technologies",
+    "content": "Средства синхронного обмена информацией в реальном времени."
+  },
+  {
+    "title": "Открытая система",
+    "description": "Open system",
+    "content": "Вычислительная среда с переносимостью, масштабируемостью, интероперабельностью."
+  },
+  {
+    "title": "Оффлайновые технологии",
+    "description": "Off-line technologies",
+    "content": "Асинхронные технологии: веб-форумы, группы новостей, рассылки."
+  },
+  {
+    "title": "Память",
+    "description": "Memory",
+    "content": "Способность объекта хранить данные в запоминающих устройствах."
+  },
+  {
+    "title": "Пластиковая карточка",
+    "description": "Plastic card",
+    "content": "Пластиковый носитель информации стандартного размера."
+  },
+  {
+    "title": "Платформа",
+    "description": "Platform",
+    "content": "Функциональный блок, используемый для выполнения большого круга задач."
+  },
+  {
+    "title": "Информационный ресурс",
+    "description": "",
+    "content": "Информация, БД или Банк данных в составе информационной системы."
+  },
+  {
+    "title": "Открытые данные",
+    "description": "",
+    "content": "Информация в машиночитаемом виде, предназначенная для свободного использования."
+  },
+  {
+    "title": "Формат открытых данных",
+    "description": "",
+    "content": "Форматы: XML, CSV, JSON, RDF и др. Машиночитаемое представление данных."
+  },
+  {
+    "title": "HTML+Microdata",
+    "description": "",
+    "content": "Методы семантической разметки данных в HTML-документах."
+  },
+  {
+    "title": "JSON",
+    "description": "JavaScript Object Notation",
+    "content": "Формат обмена данными, легко читается человеком и машиной."
+  },
+  {
+    "title": "XML",
+    "description": "eXtensible Markup Language",
+    "content": "Язык разметки, описывающий структуру и содержание данных."
+  },
+  {
+    "title": "Оператор Портала",
+    "description": "",
+    "content": "Юридическое лицо, ответственное за эксплуатацию портала и обработку данных."
+  },
+  {
+    "title": "Поставщики открытых данных",
+    "description": "",
+    "content": "Государственные органы, предоставляющие данные для Портала."
+  },
+  {
+    "title": "Пользователи",
+    "description": "",
+    "content": "Физические и юридические лица, получающие доступ к данным через Портал."
+  },
+  {
+    "title": "HTML",
+    "description": "HyperText Markup Language",
+    "content": "Язык гипертекстовой разметки для структурирования содержимого сайтов."
+  },
+  {
+    "title": "База данных",
+    "description": "",
+    "content": "Совокупность отсортированных материалов для хранения и использования."
+  },
+  {
+    "title": "Интерактивность",
+    "description": "",
+    "content": "Взаимодействие пользователя с сайтом или другими пользователями."
+  },
+  {
+    "title": "Интернет",
+    "description": "",
+    "content": "Глобальная компьютерная сеть для обмена информацией."
+  },
+  {
+    "title": "Кодирование",
+    "description": "",
+    "content": "Шифровка информации с помощью специальных символов."
+  },
+  {
+    "title": "Поисковая оптимизация сайта",
+    "description": "SEO (Search Engine Optimization)",
+    "content": "..."
+  },
+  {
+        title: "ИКТ в бухгалтерии",
+        description: "Как используются информационные технологии в бухгалтерском учете.",
+        content: "ИКТ помогают автоматизировать учет, ускорить расчеты, повысить точность данных..."
+      },
+      {
+        title: "CRM-системы в бизнесе",
+        description: "Роль CRM-систем в управлении клиентскими отношениями.",
+        content: "CRM-системы позволяют хранить информацию о клиентах, анализировать продажи и улучшать маркетинг."
+      },
+      {
+        title: "Электронная коммерция",
+        description: "Применение ИКТ в интернет-магазинах и онлайн-продажах.",
+        content: "Системы оплаты, корзины покупок, аналитика и реклама — все основано на ИКТ."
+      },
+      {
+        title: "Использование Excel в анализе",
+        description: "Как Excel помогает в финансовом и экономическом анализе.",
+        content: "Формулы, диаграммы, фильтры — мощные инструменты анализа данных."
+      },
+      {
+    "title": "Информационная технология",
+    "description": "Information technology / фр. Technologie d'information",
+    "content": "Информационная технология - совокупность методов, производственных и программно-технологических средств..."
+  },
+  {
+    "title": "Автоматизированная информационная технология (АИТ)",
+    "description": "Информационная технология, использующая вычислительную технику и системы связи",
+    "content": "Автоматизированная информационная технология - информационная технология, в которой используются методы и средства вычислительной техники..."
+  },
+  {
+    "title": "Аппаратное обеспечение",
+    "description": "Hardware",
+    "content": "Аппаратное обеспечение - комплекс электронных, электрических и механических устройств..."
+  },
+  {
+    "title": "Association for computing machinery (ACM)",
+    "description": "Ассоциация по вычислительной технике",
+    "content": "Международная научная и образовательная организация..."
+  },
+  {
+    "title": "Виртуальная реальность",
+    "description": "Virtual reality (VR)",
+    "content": "Виртуальная реальность - форма компьютерного моделирования, позволяющая пользователю погрузиться в искусственный мир..."
+  },
+  {
+    "title": "Виртуальный мир",
+    "description": "Virtual worlds",
+    "content": "Виртуальный мир - наглядная компьютерная модель реальных процессов и явлений."
+  },
+  {
+    "title": "Высокая технология",
+    "description": "",
+    "content": "Совокупность информации, знаний, опыта и средств при разработке продукции мирового уровня."
+  },
+  {
+    "title": "Геоинформационные технологии",
+    "description": "ГИС-технологии",
+    "content": "Технологическая основа географических информационных систем."
+  },
+  {
+    "title": "Инструментарий информационной технологии",
+    "description": "",
+    "content": "Один или несколько взаимосвязанных программных продуктов, с помощью которых достигается цель пользователя."
+  },
+  {
+    "title": "Информационный рынок",
+    "description": "Information market",
+    "content": "Система экономических, правовых и организационных отношений по торговле информационными продуктами и услугами."
+  },
+  {
+    "title": "Когнитивные технологии",
+    "description": "Cognitive technologies",
+    "content": "Информационные технологии, ориентированные на развитие интеллектуальных способностей человека."
+  },
+  {
+    "title": "Конвергенция информационных технологий",
+    "description": "Convergence",
+    "content": "Процесс сближения разнородных технологий в результате их взаимодействия и развития."
+  },
+  {
+    "title": "Мультимедиа",
+    "description": "Multimedia",
+    "content": "Совокупность технологий, использующих несколько информационных сред (графику, текст, видео и др.)"
+  },
+  {
+    "title": "Мультимедиа технологии",
+    "description": "Мультимедиа ресурсы; Мультимедиа средства",
+    "content": "Современные средства аудио-, видео- и визуальных коммуникаций, используемые в рекламе и маркетинге."
+  },
+  {
+    "title": "Новая информационная технология",
+    "description": "",
+    "content": "Информационная технология с дружественным интерфейсом, использующая ПК и телекоммуникации."
+  },
+  {
+    "title": "Обмен вычислительными ресурсами",
+    "description": "Peer-to-peer computing (P2P)",
+    "content": "Технология, обеспечивающая обмен вычислительными ресурсами между компьютерами в сети."
+  },
+  {
+    "title": "Онлайновые технологии",
+    "description": "On-line technologies",
+    "content": "Средства синхронного обмена информацией в реальном времени в сети."
+  },
+  {
+    "title": "Открытая система",
+    "description": "Open system",
+    "content": "Вычислительная среда с соблюдением международных стандартов, обеспечивающая переносимость, интероперабильность и др."
+  },
+  {
+    "title": "Оффлайновые технологии",
+    "description": "Off-line technologies",
+    "content": "Технологии асинхронного обмена информацией: рассылки, форумы и др."
+  },
+  {
+    "title": "Память",
+    "description": "Memory",
+    "content": "Способность объекта хранить данные в запоминающих устройствах."
+  },
+  {
+    "title": "Пластиковая карточка",
+    "description": "Plastic card",
+    "content": "Стандартная пластиковая пластина, являющаяся носителем информации."
+  },
+  {
+    "title": "Платформа",
+    "description": "Platform",
+    "content": "Функциональный блок с интерфейсом и сервисом, определяемыми международными стандартами."
+  },
+  {
+    "title": "Информационный ресурс",
+    "description": "",
+    "content": "Информация, база данных или банк данных в электронной форме в составе информационной системы."
+  },
+  {
+    "title": "Открытые данные",
+    "description": "",
+    "content": "Информация в машиночитаемом виде для свободного и многократного использования."
+  },
+  {
+    "title": "Формат открытых данных",
+    "description": "XML, CSV, JSON, RDF и др.",
+    "content": "Структурированное представление данных для автоматической обработки."
+  },
+  {
+    "title": "JSON",
+    "description": "JavaScript Object Notation",
+    "content": "Текстовый формат обмена данными, основанный на JavaScript, легко читается людьми."
+  },
+  {
+    "title": "XML",
+    "description": "eXtensible Markup Language",
+    "content": "Язык разметки, рекомендованный W3C, используется для структурирования данных."
+  },
+  {
+    "title": "CSV",
+    "description": "Comma-Separated Values",
+    "content": "Формат представления табличных данных, где значения разделяются запятыми, точками с запятой или табуляцией."
+  },
+  {
+    "title": "HTML+Microdata",
+    "description": "",
+    "content": "Методы семантической разметки с использованием HTML, обеспечивающие автоматическое считывание данных."
+  },
+  {
+    "title": "Оператор Портала",
+    "description": "",
+    "content": "Юридическое лицо, обрабатывающее информацию и управляющее Порталом."
+  },
+  {
+    "title": "Поставщики открытых данных",
+    "description": "",
+    "content": "Государственные органы, предоставляющие открытые данные для Портала."
+  },
+  {
+    "title": "Пользователи",
+    "description": "",
+    "content": "Физические и юридические лица, получающие доступ к открытым данным через Портал."
+  },
+  {
+    "title": "HTML",
+    "description": "HyperText Markup Language",
+    "content": "Набор кодов для обозначения структуры документа, благодаря которому страницы объединены и структурированы."
+  },
+  {
+    "title": "База данных",
+    "description": "",
+    "content": "Совокупность отсортированных данных, доступных для поиска и обработки ЭВМ."
+  },
+  {
+    "title": "Интерактивность",
+    "description": "",
+    "content": "Взаимодействие пользователя с другими пользователями или элементами сайта."
+  },
+  {
+    "title": "Интернет",
+    "description": "",
+    "content": "Глобальная компьютерная сеть, самое быстрое средство обмена информацией."
+  },
+  {
+    "title": "Кодирование",
+    "description": "",
+    "content": "Зашифровка информации специальными символами для хранения и передачи."
+  },
+  {
+    "title": "Поисковая оптимизация сайта",
+    "description": "SEO, Search Engine Optimization",
+    "content": "Комплекс мероприятий для повышения видимости сайта в поисковых системах."
+  }
+    ];
+
+    function searchTopics() {
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      const resultsDiv = document.getElementById('results');
+      resultsDiv.innerHTML = '';
+
+      const filtered = topics.filter(topic =>
+        topic.title.toLowerCase().includes(query) ||
+        topic.description.toLowerCase().includes(query) ||
+        topic.content.toLowerCase().includes(query)
+      );
+
+      if (filtered.length === 0) {
+        resultsDiv.innerHTML = "<p class='text-muted'>Ничего не найдено...</p>";
+        return;
+      }
+
+      filtered.forEach(topic => {
+        const col = document.createElement('div');
+        col.className = "col-md-6 col-lg-4";
+
+        const card = document.createElement('div');
+        card.className = "card mb-4";
+        card.innerHTML = `
+          <div class="card-body">
+            <h5 class="card-title">${topic.title}</h5>
+            <p class="card-text">${topic.description}</p>
+            <button class="btn btn-outline-primary" onclick="showContent(\`${topic.title}\`, \`${topic.content}\`)">Подробнее</button>
+          </div>
+        `;
+
+        col.appendChild(card);
+        resultsDiv.appendChild(col);
+      });
+    }
+
+    function showContent(title, content) {
+      const modal = new bootstrap.Modal(document.getElementById('contentModal'));
+      document.getElementById('modalTitle').innerText = title;
+      document.getElementById('modalBody').innerText = content;
+      modal.show();
+    }
+
+    window.onload = searchTopics;
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
